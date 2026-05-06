@@ -3,153 +3,827 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nurse Technician Final: Go or Not Go</title>
+    <title>Nurse Technician Mastery Final Exam</title>
     <style>
-        :root { --primary: #2c3e50; --secondary: #34495e; --accent: #27ae60; --error: #c0392b; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: #333; margin: 0; padding: 20px; line-height: 1.6; }
-        .container { max-width: 850px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .header { text-align: center; border-bottom: 2px solid #eee; margin-bottom: 20px; padding-bottom: 10px; }
-        #timer { font-size: 1.5rem; font-weight: bold; color: var(--error); position: sticky; top: 10px; background: white; padding: 10px; border-radius: 8px; z-index: 100; text-align: center; border: 1px solid #ddd; }
-        .question-block { margin-bottom: 35px; padding: 20px; border-left: 5px solid var(--primary); background: #fafafa; }
-        .options-list { list-style: none; padding: 0; }
-        .option-item { margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: 0.3s; background: white; display: flex; align-items: center; }
-        .option-item:hover { background: #edf2f7; }
-        .option-item.selected { border-color: var(--primary); background: #e2e8f0; font-weight: bold; }
-        .btn { background: var(--primary); color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; display: block; margin: 20px auto; }
-        .btn:hover { background: var(--secondary); }
-        #results { display: none; text-align: center; }
-        .hidden { display: none; }
-        .progress-meta { font-size: 0.9rem; color: #666; margin-bottom: 5px; }
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #34495e;
+            --accent-color: #16a085;
+            --danger-color: #c0392b;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        header p {
+            margin: 5px 0 0 0;
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        #timer-display {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--danger-color);
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            position: sticky;
+            top: 10px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        #login-screen, #results-screen {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .form-group {
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button.action-btn {
+            background-color: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button.action-btn:hover {
+            background-color: #117a65;
+        }
+
+        #exam-screen {
+            display: none;
+        }
+
+        .question-card {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .question-card h3 {
+            margin-top: 0;
+            font-size: 1.1rem;
+            color: var(--primary-color);
+        }
+
+        .options-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0 0 0;
+        }
+
+        .option-item {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background-color: #fafafa;
+        }
+
+        .option-item:hover {
+            background-color: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .option-item.selected {
+            background-color: #e2e8f0;
+            border-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        #results-screen {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
+    <header>
         <h1>GO OR NOT GO: NURSE TECHNICIAN FINAL</h1>
-        <p>100 Items | 25-Minute Countdown</p>
+        <p>100 Clinical Mastery Items | 25-Minute Countdown Timer</p>
+    </header>
+
+    <div id="login-screen">
+        <h2>Candidate Identification</h2>
+        <p>Please enter your full name to start the Go/No-Go final evaluation.</p>
+        <div class="form-group">
+            <label for="candidate-name">Full Name</label>
+            <input type="text" id="candidate-name" placeholder="Enter full name..." required>
+        </div>
+        <button class="action-btn" onclick="startExam()">Start Exam</button>
     </div>
 
-    <div id="setup">
-        <p>Enter your details to begin the clinical mastery exam.</p>
-        <input type="text" id="studentName" placeholder="Full Name" style="width:100%; padding:12px; margin-bottom:20px; box-sizing:border-box;">
-        <button class="btn" onclick="startExam()">Begin Final Test</button>
+    <div id="exam-screen">
+        <div id="timer-display">Time Remaining: 25:00</div>
+        <div id="questions-area"></div>
+        <button class="action-btn" style="display:block; margin: 30px auto;" onclick="submitExam()">Submit Final Exam</button>
     </div>
 
-    <div id="exam-area" class="hidden">
-        <div id="timer">Time Remaining: 25:00</div>
-        <div id="questions-container"></div>
-        <button class="btn" onclick="processResults()">Submit Final Exam</button>
-    </div>
-
-    <div id="results">
+    <div id="results-screen">
         <h2>Final Performance Summary</h2>
-        <p id="userNameDisplay"></p>
-        <h1 id="scoreDisplay" style="font-size: 3rem; margin: 10px 0;"></h1>
-        <p id="percentDisplay"></p>
-        <button class="btn" onclick="location.reload()">Retake Exam</button>
+        <p id="candidate-display"></p>
+        <h1 id="score-display"></h1>
+        <p id="status-display" style="font-weight: bold; font-size: 1.2rem;"></p>
+        <button class="action-btn" onclick="location.reload()">Restart Exam</button>
     </div>
 </div>
 
 <script>
-    // 100 UNIQUE ITEMS COMPILED FROM DAYS 1-7
-    const rawBank = [
-        { q: "What is the minimum duration for rubbing hands with soap per WHO?", a: ["Rub hands for 10 seconds.", "Rub hands for 20 seconds.", "Rub hands for 40 seconds.", "Rub hands for 60 seconds."], c: 1 },
-        { q: "An adult pulse of 115 bpm is documented as:", a: ["Normal heart rhythm.", "Chronic bradycardia.", "Active tachycardia.", "Stable hypertension."], c: 2 },
-        { q: "How often should a bedridden patient be repositioned to avoid injury?", a: ["Reposition every hour.", "Reposition every 2 hours.", "Reposition every 4 hours.", "Reposition every 8 hours."], c: 1 },
-        { q: "To prevent back injury, the technician should lift by:", a: ["Bending at the waist.", "Using the back muscles.", "Bending at the knees.", "Locking both elbows."], c: 2 },
-        { q: "Contact Precautions require which minimum PPE?", a: ["Mask and face shield.", "Gown and clean gloves.", "N95 and sterile gloves.", "Goggles and head cover."], c: 1 },
-        { q: "Gas exchange occurs primarily in which part of the lung?", a: ["The upper bronchus.", "The primary trachea.", "The microscopic alveoli.", "The internal larynx."], c: 2 },
-        { q: "What is the priority intervention for a patient with Dysphagia?", a: ["Serve thin liquids.", "Use a supine position.", "Keep the patient upright.", "Encourage fast eating."], c: 2 },
-        { q: "Hypoglycemia (low blood sugar) typically presents as:", a: ["Hot and dry skin.", "Shaky and confused.", "Fruity breath scent.", "High energy levels."], c: 1 },
-        { q: "Jaundice is clinically observed as yellowing of the:", a: ["Palms and the feet.", "Sclera and the skin.", "Abdomen and chest.", "Fingernails and hair."], c: 1 },
-        { q: "What device is best for a stand-and-pivot transfer of an unsteady patient?", a: ["A mechanical hoist.", "A padded gait belt.", "A plastic slide board.", "A linen draw sheet."], c: 1 },
-        { q: "The proper order for a bed bath starts with the:", a: ["Legs and the feet.", "Back and buttocks.", "Face and the eyes.", "Perineal body area."], c: 2 },
-        { q: "When describing food to a blind patient, use the:", a: ["Clock face method.", "Compass direction.", "Color coding system.", "Finger touch method."], c: 0 },
-        { q: "Stop passive Range of Motion (ROM) immediately if:", a: ["The skin looks pink.", "The patient feels pain.", "The joint feels warm.", "The patient is tired."], c: 1 },
-        { q: "To ensure weight accuracy for CHF patients, weigh them:", a: ["After the lunch meal.", "At the same time daily.", "While wearing shoes.", "With different scales."], c: 1 },
-        { q: "Discussing patient details in a cafeteria violates:", a: ["Facility dress codes.", "Hospital food rules.", "HIPAA confidentiality.", "Employee labor laws."], c: 2 },
-        { q: "If a patient refuses a bath, the technician should:", a: ["Force them to bathe.", "Report it to family.", "Respect the refusal.", "Withhold the meals."], c: 2 },
-        { q: "Invasion of privacy includes which of the following?", a: ["Closing the curtain.", "Searching a purse.", "Knocking on doors.", "Using a bath blanket."], c: 1 },
-        { q: "A DNR (Do Not Resuscitate) order means the technician:", a: ["Does not give water.", "Does not perform CPR.", "Does not enter room.", "Does not talk to family."], c: 1 },
-        { q: "Non-verbal signs of pain include which of the following?", a: ["Sleeping soundly.", "Facial grimacing.", "Laughing with staff.", "Normal breathing."], c: 1 },
-        { q: "Accepting a cash tip from a family member is:", a: ["Expected behavior.", "Unethical practice.", "Required by policy.", "Helpful to the team."], c: 1 },
-        { q: "What is the first action after a needle-stick injury?", a: ["Fill a formal report.", "Wash with soap/water.", "Check patient files.", "Apply a dry bandage."], c: 1 },
-        { q: "Airborne precautions (e.g. TB) require the room to be:", a: ["Open to the hallway.", "Negative pressure.", "Kept very warm.", "Shared with others."], c: 1 },
-        { q: "The 'R' in the fire safety acronym RACE stands for:", a: ["Run for the exit.", "Rescue those in danger.", "Report to the nurse.", "Ring the fire alarm."], c: 1 },
-        { q: "The 'P' in the extinguisher acronym PASS stands for:", a: ["Push the red button.", "Pull the safety pin.", "Point at the ceiling.", "Press the lever hard."], c: 1 },
-        { q: "Which task is outside the Technician's scope of practice?", a: ["Recording a BP.", "Adjusting IV pumps.", "Assisting with meals.", "Changing bed linens."], c: 1 },
-        // ... (Remaining 75 items generated using identical length distractors to prevent guessing)
+    // Master Test Bank compiled and expanded to 100 items from Day 1-7 materials
+    const masterBank = [
+        {
+            q: "According to the World Health Organization (WHO), what is the minimum duration for rubbing hands with soap and water?",
+            o: ["5 to 10 seconds", "20 to 30 seconds", "60 to 90 seconds", "3 minutes"],
+            a: 1
+        },
+        {
+            q: "While taking the vital signs of an adult patient, the nurse technician notes a pulse rate of 115 beats per minute. Which term should the technician use to document this finding?",
+            o: ["Bradycardia", "Eupnea", "Tachycardia", "Hypertension"],
+            a: 2
+        },
+        {
+            q: "To prevent the development of pressure injuries in a bedridden patient, the nurse technician should ensure the patient is repositioned at least every:",
+            o: ["1 hour", "2 hours", "4 hours", "8 hours"],
+            a: 1
+        },
+        {
+            q: "When moving a patient from the bed to a stretcher, which body mechanics principle should the nurse technician apply to prevent self-injury?",
+            o: ["Bend at the waist to use back muscles", "Keep the feet close together", "Keep the weight far from the body", "Bend at the knees using leg muscles"],
+            a: 3
+        },
+        {
+            q: "A nurse technician is about to enter the room of a patient on Contact Precautions. Which piece of Personal Protective Equipment (PPE) is required at a minimum?",
+            o: ["N95 respirator and goggles", "Gown and gloves", "Surgical mask and shoe covers", "No PPE is needed"],
+            a: 1
+        },
+        {
+            q: "A patient is diagnosed with Pneumonia. The technician understands that this condition primarily affects which part of the respiratory system where gas exchange occurs?",
+            o: ["The trachea", "The alveoli", "The larynx", "The esophagus"],
+            a: 1
+        },
+        {
+            q: "The technician is caring for a patient with dysphagia. What is the most important safety intervention during mealtime?",
+            o: ["Encourage the patient to eat as fast as possible", "Keep the patient in a flat, supine position while eating", "Monitor for coughing or choking and ensure they are upright", "Provide a straw for all thin liquids"],
+            a: 2
+        },
+        {
+            q: "When a patient has Hypertension, which organ system is under increased pressure and at higher risk for long-term damage?",
+            o: ["Integumentary system", "Cardiovascular system", "Skeletal system", "Sensory system"],
+            a: 1
+        },
+        {
+            q: "A patient with Diabetes Mellitus has a very low blood glucose level. Which of the following signs should the technician watch for?",
+            o: ["Dry and hot skin with extreme thirst", "Frequent urination and fruity breath", "Shakiness, sweating, and confusion", "High energy levels and loud speech"],
+            a: 2
+        },
+        {
+            q: "What physical change should the technician look for to confirm a diagnosis of Jaundice in a patient with Liver Cirrhosis?",
+            o: ["Deep purple bruising on the legs", "Yellowing of the skin and the sclera", "Bright red rash across the chest", "Extremely pale or blue fingernails"],
+            a: 1
+        },
+        {
+            q: "When caring for a patient with a fractured femur, which part of the body is the technician helping to protect?",
+            o: ["The upper arm bone", "The thigh bone", "The kneecap", "The collarbone"],
+            a: 1
+        },
+        {
+            q: "To safely transfer an unsteady patient who can bear some weight, which device should the technician use?",
+            o: ["A mechanical lift", "A transfer (gait) belt", "A sliding board", "A linen bedsheet"],
+            a: 1
+        },
+        {
+            q: "When performing a bed bath, in what order should the nurse technician wash the body parts to maintain infection control?",
+            o: ["Feet, legs, then face", "Back, buttocks, then chest", "Face, arms, trunk, legs, then perineal area", "Perineal area, then face and neck"],
+            a: 2
+        },
+        {
+            q: "When assisting a visually impaired patient to eat, which method is most effective for describing the location of food?",
+            o: ["Using the numbers on a clock face", "Pointing to the food and saying 'It is right here'", "Moving the patient's hand to touch each food item", "Mixing all the food together in the dish"],
+            a: 0
+        },
+        {
+            q: "While performing passive Range of Motion exercises for an elbow, the technician should stop the movement immediately if:",
+            o: ["The skin becomes slightly pink", "The patient complains of pain or resistance", "The patient asks for a glass of water", "The arm starts sweating"],
+            a: 1
+        },
+        {
+            q: "To ensure accuracy when weighing a patient with fluid retention issues, the technician should:",
+            o: ["Weigh the patient with their shoes on", "Weigh the patient at different times of the day", "Use the same scale under the same conditions daily", "Allow the patient to drink fluids right before weighing"],
+            a: 2
+        },
+        {
+            q: "A nurse technician discussing patient behavior in the cafeteria violates which patient right?",
+            o: ["The right to a private room", "HIPAA and patient confidentiality", "The hospital's dress code policy", "The technician's right to free speech"],
+            a: 1
+        },
+        {
+            q: "If a competent patient refuses a scheduled bath, stating they are too tired, the most appropriate response is to:",
+            o: ["Force the patient to bathe anyway", "Respect the patient's right to refuse and try later", "Tell the patient they cannot have dinner", "Call the family to scold the patient"],
+            a: 1
+        },
+        {
+            q: "Which of the following actions by a nurse technician would be considered an Invasion of Privacy?",
+            o: ["Closing the curtain before a bedpan procedure", "Looking through a patient's personal purse", "Knocking on the door before entering", "Covering a patient with a bath blanket"],
+            a: 1
+        },
+        {
+            q: "When a family member calls for an update on a patient's condition, the nurse technician should:",
+            o: ["Give a detailed report of the condition", "Provide basic non-confidential reassurance", "Refer the caller to the nurse in charge", "Hang up the phone immediately"],
+            a: 2
+        },
+        {
+            q: "If a patient has a Do Not Resuscitate (DNR) order, the technician should:",
+            o: ["Start CPR immediately if the patient stops breathing", "Notify the nurse immediately if the patient is found without a pulse", "Call a Code Blue", "Provide fluids immediately"],
+            a: 1
+        },
+        {
+            q: "Which of the following is a non-verbal sign that a patient is experiencing pain?",
+            o: ["Sleeping soundly through the night", "Facial grimacing and guarding", "Laughing while watching television", "Normal respiratory rate and depth"],
+            a: 1
+        },
+        {
+            q: "When a grateful family member offers the technician a cash tip, the technician should:",
+            o: ["Accept the money but do not tell anyone", "Politely decline due to ethical standards", "Ask for a different amount", "Place it in the general donation box"],
+            a: 1
+        },
+        {
+            q: "What is the correct sequence for donning PPE?",
+            o: ["Gloves, gown, mask, goggles", "Gown, mask, goggles, gloves", "Mask, gloves, gown, goggles", "Goggles, gloves, mask, gown"],
+            a: 1
+        },
+        {
+            q: "If a nurse technician accidentally suffers a needle-stick injury, the first action is to:",
+            o: ["Complete an incident report", "Wash the site thoroughly with soap and water", "Test the patient for infectious diseases", "Apply a bandage and continue working"],
+            a: 1
+        },
+        {
+            q: "A patient with suspected Tuberculosis (TB) must be placed in what type of room?",
+            o: ["A standard private room", "Negative-pressure isolation room", "A room with maximum sunlight", "A room with no door"],
+            a: 1
+        },
+        {
+            q: "What does the letter 'C' in the RACE fire response protocol stand for?",
+            o: ["Call the operator", "Contain the fire by closing doors", "Check the patient's ID", "Clear the room of all equipment"],
+            a: 1
+        },
+        {
+            q: "During the operation of a fire extinguisher, what does the acronym PASS stand for?",
+            o: ["Pull, Aim, Squeeze, Sweep", "Push, Activate, Shield, Spray", "Protect, Assist, Slide, Stop", "Pull, Assess, Select, System"],
+            a: 0
+        },
+        {
+            q: "Which of the following tasks is strictly outside the nurse technician's scope of practice?",
+            o: ["Recording vital signs", "Adjusting the flow rate of an IV medication", "Assisting a patient to ambulate", "Emptying a drainage bag"],
+            a: 1
+        },
+        {
+            q: "When an incident occurs involving a patient or staff member, what is the purpose of filling out an incident report?",
+            o: ["To punish the employee responsible", "To document system failures and promote quality improvement", "To share information with visitors", "To bill the patient's insurance"],
+            a: 1
+        },
+        {
+            q: "Which is the first action when you smell smoke or discover a fire in a patient room?",
+            o: ["Activate the alarm", "Rescue anyone in immediate danger", "Extinguish the fire", "Contain the smoke"],
+            a: 1
+        },
+        {
+            q: "When sterilizing equipment, which process kills all microorganisms including bacterial spores?",
+            o: ["Washing with soap and water", "Wiping with alcohol", "Steam sterilization using an autoclave", "Soaking in a bleach solution"],
+            a: 2
+        },
+        {
+            q: "What should the nurse technician do when observing a frayed electrical cord on a medical device?",
+            o: ["Fix it using electrical tape", "Ignore it if the device still turns on", "Remove the device and mark it as broken", "Ask the patient to fix it"],
+            a: 2
+        },
+        {
+            q: "What is the most effective approach to handle a patient becoming agitated and pacing in the common area?",
+            o: ["Place the patient in immediate seclusion", "Maintain a safe distance, stay calm, and notify the nurse", "Call the security team to hold the patient", "Turn off the lights and leave the room"],
+            a: 1
+        },
+        {
+            q: "How can the technician ensure patient skin integrity when changing an elderly patient's position?",
+            o: ["Pull the patient quickly across the bottom sheet", "Slide the patient over rough areas", "Lift using a draw sheet to avoid shearing forces", "Reposition the patient only once per shift"],
+            a: 2
+        },
+        {
+            q: "Which type of diet contains only liquids that are clear at room temperature?",
+            o: ["Full liquid diet", "Mechanical soft diet", "Clear liquid diet", "High-protein diet"],
+            a: 2
+        },
+        {
+            q: "To accurately measure an adult patient's respiratory rate, the technician should count for how long?",
+            o: ["15 seconds", "30 seconds", "60 seconds", "10 seconds"],
+            a: 2
+        },
+        {
+            q: "When a patient's peripheral extremities turn slightly blue, this condition is known as:",
+            o: ["Jaundice", "Cyanosis", "Tachycardia", "Hypertension"],
+            a: 1
+        },
+        {
+            q: "What is the primary function of red blood cells in the human body?",
+            o: ["To fight off viral infections", "To carry oxygen throughout the body", "To help clot blood after an injury", "To break down dietary fats"],
+            a: 1
+        },
+        {
+            q: "In an older male patient, benign prostatic hyperplasia (BPH) commonly affects which function?",
+            o: ["Bowel movements", "Urination and stream strength", "Ability to swallow", "Range of motion"],
+            a: 1
+        },
+        {
+            q: "When dealing with patients with peripheral arterial disease (PAD), which clinical assessment is most critical?",
+            o: ["Checking color and temperature in the feet", "Assessing the patient's breathing rate", "Evaluating speech and memory", "Checking for abdominal pain"],
+            a: 0
+        },
+        {
+            q: "What is the key sign of respiratory distress in an infant patient?",
+            o: ["Sleeping for long periods", "Nasal flaring and grunting", "Increased appetite", "Normal, quiet breathing"],
+            a: 1
+        },
+        {
+            q: "Which toy presents a hazard if brought into a high-oxygen tent environment?",
+            o: ["A plastic baby rattle", "A wooden building block", "A friction-based electronic car toy", "A soft rubber ball"],
+            a: 2
+        },
+        {
+            q: "If a patient states that they see bugs on the wall, what is the best approach?",
+            o: ["Agree that you see the bugs too", "Dismiss the patient's statement by laughing", "Acknowledge the patient's feeling of fear but state reality", "Tell the patient they must be asleep"],
+            a: 2
+        },
+        {
+            q: "When performing perineal care for a female patient, the technician must wipe in what direction?",
+            o: ["From back to front", "From front to back", "In a circular motion", "Only side to side"],
+            a: 1
+        },
+        {
+            q: "If an unconscious patient needs oral care, in what position should the technician place the patient to prevent aspiration?",
+            o: ["Flat on their back", "Prone position", "Side-lying position", "Trendelenburg position"],
+            a: 2
+        },
+        {
+            q: "Which of the following is considered an objective observation?",
+            o: ["'My stomach hurts'", "'My head is spinning'", "The patient's blood pressure is 130/85 mmHg", "'I feel really sad today'"],
+            a: 2
+        },
+        {
+            q: "What is the best way to correct an error when charting on a paper medical record?",
+            o: ["Use correction fluid", "Draw a single line through the error, write 'error', and initial", "Scribble the error out until it cannot be read", "Erase the writing completely"],
+            a: 1
+        },
+        {
+            q: "How far should the tip of an enema tube be inserted into an adult patient's rectum?",
+            o: ["2 to 4 inches (5 to 10 cm)", "6 to 8 inches", "1 inch", "More than 10 inches"],
+            a: 0
+        },
+        {
+            q: "When preparing a patient for a surgical procedure, what is the role of the nurse technician regarding informed consent?",
+            o: ["Obtain the patient's signature", "Explain the risks of the procedure", "Ensure the patient is informed, though the doctor obtains consent", "Cancel the procedure if the patient is confused"],
+            a: 2
+        },
+        {
+            q: "A patient with peripheral edema and a heart condition has a fluid restriction. What volume of intake remaining should be reported?",
+            o: ["100 mL", "500 mL", "1000 mL", "2000 mL"],
+            a: 0
+        },
+        {
+            q: "How should a nurse technician respond when an IV infusion stops dripping?",
+            o: ["Readjust the IV bag height on your own", "Check for kinks or visible blockages and inform the nurse", "Disconnect the tubing to flush the line", "Increase the infusion rate"],
+            a: 1
+        },
+        {
+            q: "After a patient passes away, the post-mortem care process should focus on:",
+            o: ["Leaving the room exactly as it is without touching the body", "Treating the body with respect to create a dignified environment for the family", "Performing an autopsy", "Preparing the patient's property to be thrown away"],
+            a: 1
+        },
+        {
+            q: "When measuring oxygen saturation with a pulse oximeter, what factor might cause a false reading?",
+            o: ["The patient is sitting upright", "Dark-colored nail polish on the finger", "The room temperature is normal", "The patient is breathing normally"],
+            a: 1
+        },
+        {
+            q: "Which term is used to describe an oral temperature of 38.5°C?",
+            o: ["Hypothermia", "Febrile (fever)", "Normothermia", "Bradypnea"],
+            a: 1
+        },
+        {
+            q: "When a patient is having a seizure, the most important safety action by the technician is to:",
+            o: ["Restrain the patient's arms and legs", "Clear the surrounding area and turn the patient's head to the side", "Force the patient's mouth open to insert a tongue blade", "Pour cold water on the patient's face"],
+            a: 1
+        },
+        {
+            q: "The nurse technician observes that a patient has difficulty breathing. Which position is most appropriate to help improve lung expansion?",
+            o: ["Supine position", "Fowler's position", "Prone position", "Trendelenburg position"],
+            a: 1
+        },
+        {
+            q: "Which sign of potential abuse should the technician report to the nurse immediately?",
+            o: ["An old scar on the arm", "Unexplained bruising in different stages of healing", "A slight redness from a blood pressure cuff", "A small scratch from a pet"],
+            a: 1
+        },
+        {
+            q: "Which technique is most effective when communicating with an older adult who is hard of hearing?",
+            o: ["Scream the message loudly in the patient's ear", "Face the patient and speak clearly at a normal volume and pace", "Talk to the patient only through family members", "Write only long paragraphs of information"],
+            a: 1
+        },
+        {
+            q: "What is the correct procedure for removing personal protective equipment (PPE)?",
+            o: ["Remove mask first, then gloves, then gown", "Remove gloves first, then gown, then mask", "Remove all items at once", "It does not matter what sequence is used"],
+            a: 1
+        },
+        {
+            q: "When caring for a patient who is on airborne precautions, what type of mask must the technician wear?",
+            o: ["A standard surgical mask", "A high-efficiency N95 respirator", "A procedural face shield", "No mask is necessary"],
+            a: 1
+        },
+        {
+            q: "When a patient complains of an itch under a plaster cast, the technician should:",
+            o: ["Insert a long object to scratch the skin", "Report the issue to the nurse for assessment", "Remove the cast", "Apply hot water to the cast"],
+            a: 1
+        },
+        {
+            q: "Which type of burn or wound area requires special attention to a hat or cap for thermoregulation?",
+            o: ["A small cut on the finger", "Extensive burn over a large body surface area", "A minor scrape on the knee", "A surgical incision on the abdomen"],
+            a: 1
+        },
+        {
+            q: "Which equipment helps a patient to maintain lung volume and prevent post-operative atelectasis?",
+            o: ["An incentive spirometer", "A nebulizer", "A standard nasal cannula", "A suction device"],
+            a: 0
+        },
+        {
+            q: "If an adult patient's pulse is 55 beats per minute, the technician should document the condition as:",
+            o: ["Tachycardia", "Normocardia", "Bradycardia", "Bradypnea"],
+            a: 2
+        },
+        {
+            q: "When an unsteady patient begins to fall while walking, the technician should:",
+            o: ["Try to catch the patient and hold them up", "Ease the patient down the technician's leg to the floor", "Let the patient fall alone", "Instruct the patient to jump onto the bed"],
+            a: 1
+        },
+        {
+            q: "What is the safe operating procedure for placing a newborn on a scale during weighing?",
+            o: ["Step away to collect recording sheets", "Hover a hand just above the infant at all times to ensure safety", "Wrap the baby in a heavy blanket", "Weigh the newborn on a bed"],
+            a: 1
+        },
+        {
+            q: "When handling a patient's personal property, what is the best action for securing a large sum of cash?",
+            o: ["Store the cash in the technician's uniform pocket", "Advise the patient to place the money in the hospital safe", "Hide the cash under the patient's bed pillow", "Leave the cash in the bedside table drawer"],
+            a: 1
+        },
+        {
+            q: "If a patient refuses to eat their hospital lunch because it conflicts with their religious practices, the technician should:",
+            o: ["Require the patient to eat the food provided", "Inform the nurse and arrange for appropriate meal choices", "Throw the food away without speaking to anyone", "Tell the patient they will be discharged"],
+            a: 1
+        },
+        {
+            q: "What does the 'A' in the PASS fire extinguisher protocol stand for?",
+            o: ["Activate the fire alarm", "Aim the nozzle at the base of the fire", "Assess the situation", "Alert other staff"],
+            a: 1
+        },
+        {
+            q: "The temperature of an incubator or infant warmer must be maintained with functional:",
+            o: ["Manual adjustments only", "Temperature alarms and heating element controls", "Overhead room lights", "An open window to keep air fresh"],
+            a: 1
+        },
+        {
+            q: "If a patient states that they are having an AMA (Against Medical Advice) discharge, the technician must immediately:",
+            o: ["Let the patient walk out without informing the team", "Involve the nurse to ensure all risks are documented", "Lock the exits", "Call the hospital operator"],
+            a: 1
+        },
+        {
+            q: "What information must be checked before a nurse technician administers any care to a patient?",
+            o: ["The room number on the door", "Two forms of patient identification (e.g., ID band)", "The name of the patient's visitor", "The color of the patient's bedsheets"],
+            a: 1
+        },
+        {
+            q: "When assisting a patient with left-sided weakness to stand, the technician should stand on which side of the patient?",
+            o: ["The right side (strong side)", "The left side (weak side)", "In front of the patient's feet", "Behind the wheelchair"],
+            a: 1
+        },
+        {
+            q: "When testing a patient's blood glucose level, what should the technician do if the control solution has expired?",
+            o: ["Use the solution if it still looks clear", "Substitute the solution with tap water", "Use a new, unexpired control solution", "Perform the test directly on the patient without controls"],
+            a: 2
+        },
+        {
+            q: "What is the primary action for a patient who is choking but still conscious and cannot speak?",
+            o: ["Give the patient a glass of water to drink", "Perform the abdominal thrust (Heimlich) maneuver", "Check the patient's blood pressure", "Wait for the patient to cough the item up"],
+            a: 1
+        },
+        {
+            q: "To assist a postpartum mother, the technician notices soaked bedsheets with bright red blood. What is the priority action?",
+            o: ["Change the sheets and say nothing", "Notify the nurse of the hemorrhage immediately", "Massage the abdomen vigorously without being instructed", "Tell the mother to walk around"],
+            a: 1
+        },
+        {
+            q: "When a child is crying and nervous in the pediatric unit, what is the best intervention to take?",
+            o: ["Tell the child to stop crying", "Lock the door to prevent the child from leaving", "Use simple distractions like a toy or a storybook", "Ignore the child for long periods"],
+            a: 2
+        },
+        {
+            q: "A technician realizes that they charted on the wrong patient. What is the appropriate step to take?",
+            o: ["Delete the digital file", "Inform the nurse so an addendum or correction can be made to the record", "Write over the text", "Tell the patient"],
+            a: 1
+        },
+        {
+            q: "What is the primary sign of dehydration or fluid volume deficit in an adult patient?",
+            o: ["High blood pressure", "Dark yellow urine and dry mucous membranes", "Increased heart rate", "Swelling in the feet and ankles"],
+            a: 1
+        },
+        {
+            q: "To maintain an open airway in an infant with respiratory distress, what basic airway maneuver should the technician ensure?",
+            o: ["Hyperextend the infant's neck", "Keep the head of the bed flat", "Maintain proper alignment without hyperflexing the neck", "Place the infant on the side"],
+            a: 2
+        },
+        {
+            q: "When working in an examination room, what is the priority when dealing with a patient exhibiting suicidal ideation?",
+            o: ["Leave the patient alone", "Provide a glass vase of flowers", "Maintain direct, continuous observation until a nurse takes over", "Turn the room lights off"],
+            a: 2
+        },
+        {
+            q: "When you must review a procedure for cleaning up a chemical spill, where do you find this information?",
+            o: ["In the patient's chart", "In the Safety Data Sheet (SDS) binder", "On the medication cart", "In the hospital breakroom"],
+            a: 1
+        },
+        {
+            q: "Which of the following is considered a subjective finding by the nurse technician?",
+            o: ["The patient's pulse is 80 bpm", "The patient's temperature is 37°C", "The patient states: 'I have a headache and feel dizzy'", "The patient's urine output is 200 mL"],
+            a: 2
+        },
+        {
+            q: "When a patient is experiencing dyspnea, which position should the technician ensure the bed is set to?",
+            o: ["Trendelenburg", "Fowler's position", "Supine position", "Sims' position"],
+            a: 1
+        },
+        {
+            q: "What is the normal range for adult respiratory rate at rest?",
+            o: ["8 to 10 breaths/min", "12 to 20 breaths/min", "25 to 30 breaths/min", "35 to 40 breaths/min"],
+            a: 1
+        },
+        {
+            q: "A technician must decline a task if it is: ",
+            o: ["Outside the technician's scope of practice", "Simple and routine", "Assigned by a registered nurse", "An expected daily task"],
+            a: 0
+        },
+        {
+            q: "When a patient has an indwelling (Foley) catheter, the urine bag must always be kept:",
+            o: ["Above the level of the bladder", "Below the level of the bladder to prevent backflow", "Flat on the floor", "Attached to the bed linens"],
+            a: 1
+        },
+        {
+            q: "Which finding should the technician report immediately to the licensed nurse?",
+            o: ["The patient's temperature is 36.8°C", "The patient's pulse increased from 72 to 110 beats per minute", "The patient is drinking water", "The patient refused a snack"],
+            a: 1
+        },
+        {
+            q: "When taking a blood pressure measurement, if the cuff is too small, the reading will be:",
+            o: ["Falsely low", "Accurate", "Falsely high", "Independent of cuff size"],
+            a: 2
+        },
+        {
+            q: "Which of the following is an example of an airborne infection that requires special respiratory precautions?",
+            o: ["Influenza", "Tuberculosis (TB)", "Staphylococcus", "Conjunctivitis"],
+            a: 1
+        },
+        {
+            q: "What is the most effective way to prevent the spread of healthcare-associated infections?",
+            o: ["Wearing gloves at all times", "Performing hand hygiene per protocols", "Washing bed linens daily", "Using a private room"],
+            a: 1
+        },
+        {
+            q: "Which patient is at the highest risk for developing a pressure injury?",
+            o: ["A patient who ambulates in the hallway three times a day", "An active patient who uses a walker", "A bedridden patient who cannot turn or reposition themselves", "A patient who sits in a chair for 30 minutes"],
+            a: 2
+        },
+        {
+            q: "The medical term 'bradycardia' means:",
+            o: ["Fast heart rate", "Slow heart rate", "Normal heart rate", "No heart rate"],
+            a: 1
+        },
+        {
+            q: "When transferring a patient, the 'friction' or rubbing of skin against bedsheets is called:",
+            o: ["Subluxation", "Shearing", "Contracture", "Ischemia"],
+            a: 1
+        },
+        {
+            q: "How often should a patient's skin be assessed for redness or early pressure injuries during repositioning?",
+            o: ["Once a week", "Every shift", "Only upon discharge", "Once a day"],
+            a: 1
+        },
+        {
+            q: "Infection control guidelines dictate that when washing hands, the water temperature should be:",
+            o: ["Hot enough to kill all germs", "Warm, so it does not dry out or damage the skin", "As cold as possible", "Kept boiling"],
+            a: 1
+        },
+        {
+            q: "To prevent a deep vein thrombosis (DVT) in a post-operative patient, the technician should assist the patient with:",
+            o: ["Prolonged, uninterrupted bed rest", "Ambulation and compression stockings", "Drinking large amounts of ice water", "Lying flat in the bed"],
+            a: 1
+        },
+        {
+            q: "If you notice an unresponsive patient, you must check for breathing and a pulse simultaneously for no more than:",
+            o: ["1 to 2 seconds", "5 seconds", "10 seconds", "1 minute"],
+            a: 2
+        },
+        {
+            q: "What is the minimum number of identifiers needed to verify a patient's identity before a procedure?",
+            o: ["One identifier", "Two distinct identifiers", "Three identifiers", "Four identifiers"],
+            a: 1
+        },
+        {
+            q: "Which step in the RACE fire protocol is often forgotten but critical for preventing the spread of a fire?",
+            o: ["Rescue", "Alarm", "Contain by closing doors and windows", "Extinguish"],
+            a: 2
+        },
+        {
+            q: "When setting up an oxygen tank or concentrator, it is important to remember that oxygen:",
+            o: ["Is a fire hazard and supports combustion", "Can be adjusted by the technician", "Can be used near open flames", "Is absorbed through the skin"],
+            a: 0
+        },
+        {
+            q: "What is the medical term for high blood pressure?",
+            o: ["Hypotension", "Hypertension", "Tachycardia", "Tachypnea"],
+            a: 1
+        },
+        {
+            q: "When measuring height using a stadiometer, the patient's position should be:",
+            o: ["Slouching in the chair", "Looking down with shoulders slouched", "Standing tall with heels against the base and looking straight ahead", "Lying in the bed"],
+            a: 2
+        }
     ];
 
-    // Auto-generate the bank to exactly 100 items for the simulation
-    while(rawBank.length < 100) {
-        let i = rawBank.length;
-        rawBank.push({
-            q: `Clinical Item #${i+1}: A technician identifies an error in documentation. What is the standard correction method?`,
-            a: ["Use white correction fluid.", "Scribble out the mistake.", "Single line and initials.", "Erasure of the pencil."],
-            c: 2
-        });
-    }
-
-    let timeLeft = 1500; // 25 Minutes
-    let timerId;
+    let generatedQuestions = [];
+    let currentCandidate = "";
+    let score = 0;
+    let timeLeft = 1500; // 25 minutes in seconds
+    let timerInterval;
 
     function startExam() {
-        if(!document.getElementById('studentName').value) return alert("Enter name first.");
-        document.getElementById('setup').classList.add('hidden');
-        document.getElementById('exam-area').classList.remove('hidden');
+        const candidateNameInput = document.getElementById('candidate-name').value.trim();
+        if (!candidateNameInput) {
+            alert("Please enter your name to start the exam.");
+            return;
+        }
+
+        currentCandidate = candidateNameInput;
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('exam-screen').style.display = 'block';
+
+        // Set exactly 100 questions using the masterBank
+        generatedQuestions = [];
+        for (let i = 0; i < 100; i++) {
+            const baseItem = masterBank[i % masterBank.length];
+            generatedQuestions.push({
+                q: `Clinical Item #${i + 1}: ${baseItem.q.replace(/Clinical Item #\d+: /, '')}`,
+                o: [...baseItem.o],
+                a: baseItem.a,
+                id: i
+            });
+        }
         
-        const container = document.getElementById('questions-container');
-        rawBank.forEach((item, idx) => {
-            const div = document.createElement('div');
-            div.className = 'question-block';
-            div.innerHTML = `
-                <div class="progress-meta">Item ${idx + 1} of 100</div>
-                <p><strong>${item.q}</strong></p>
+        renderQuestions();
+        startTimer();
+    }
+
+    function renderQuestions() {
+        const area = document.getElementById('questions-area');
+        area.innerHTML = '';
+
+        generatedQuestions.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            card.innerHTML = `
+                <h3>${item.q}</h3>
                 <div class="options-list">
-                    ${item.a.map((opt, i) => `
-                        <div class="option-item" onclick="select(this, ${idx}, ${i})">
-                            <input type="radio" name="q${idx}" style="margin-right:10px"> ${opt}
+                    ${item.o.map((opt, oIdx) => `
+                        <div class="option-item" onclick="selectOption(${index}, ${oIdx}, this)">
+                            <input type="radio" name="q${index}" style="display:none;"> ${opt}
                         </div>
                     `).join('')}
                 </div>
             `;
-            container.appendChild(div);
+            area.appendChild(card);
+        });
+    }
+
+    function selectOption(qIdx, oIdx, element) {
+        const card = element.parentElement;
+        const siblings = card.querySelectorAll('.option-item');
+        
+        siblings.forEach(sib => {
+            sib.classList.remove('selected');
         });
 
-        timerId = setInterval(countdown, 1000);
+        element.classList.add('selected');
+        generatedQuestions[qIdx].userAnswer = oIdx;
     }
 
-    function select(el, qIdx, aIdx) {
-        const parent = el.parentElement;
-        parent.querySelectorAll('.option-item').forEach(child => child.classList.remove('selected'));
-        el.classList.add('selected');
-        el.querySelector('input').checked = true;
-        rawBank[qIdx].userAnswer = aIdx;
+    function startTimer() {
+        let timerDisplay = document.getElementById('timer-display');
+        timerInterval = setInterval(() => {
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            timerDisplay.innerText = `Time Remaining: ${m}:${s < 10 ? '0' : ''}${s}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                submitExam();
+            }
+            timeLeft--;
+        }, 1000);
     }
 
-    function countdown() {
-        timeLeft--;
-        let m = Math.floor(timeLeft / 60);
-        let s = timeLeft % 60;
-        document.getElementById('timer').innerText = `Time Remaining: ${m}:${s < 10 ? '0'+s : s}`;
-        if(timeLeft <= 0) processResults();
-    }
+    function submitExam() {
+        clearInterval(timerInterval);
+        score = 0;
 
-    function processResults() {
-        clearInterval(timerId);
-        let score = 0;
-        rawBank.forEach(item => {
-            if(item.userAnswer === item.c) score++;
+        generatedQuestions.forEach(item => {
+            if (item.userAnswer === item.a) {
+                score++;
+            }
         });
 
-        document.getElementById('exam-area').classList.add('hidden');
-        document.getElementById('results').style.display = 'block';
-        document.getElementById('userNameDisplay').innerText = `Results for: ${document.getElementById('studentName').value}`;
-        document.getElementById('scoreDisplay').innerText = `${score} / 100`;
-        document.getElementById('percentDisplay').innerText = score >= 80 ? "STATUS: GO (Passed)" : "STATUS: NOT GO (Failed)";
-        window.scrollTo(0,0);
+        document.getElementById('exam-screen').style.display = 'none';
+        document.getElementById('results-screen').style.display = 'block';
+
+        document.getElementById('candidate-display').innerText = `Candidate: ${currentCandidate}`;
+        document.getElementById('score-display').innerText = `${score} / 100`;
+
+        if (score >= 80) {
+            document.getElementById('status-display').innerText = "STATUS: GO (Qualified)";
+            document.getElementById('status-display').style.color = "var(--accent-color)";
+        } else {
+            document.getElementById('status-display').innerText = "STATUS: NOT GO (Not Qualified)";
+            document.getElementById('status-display').style.color = "var(--danger-color)";
+        }
+        
+        window.scrollTo(0, 0);
     }
 </script>
 

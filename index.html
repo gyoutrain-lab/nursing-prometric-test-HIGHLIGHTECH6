@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nurse Technician Mastery: 100-Item Final Exam</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f7f6;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header h1 { margin: 0 0 10px 0; font-size: 1.8em; }
+        .header p { margin: 0; font-size: 1em; opacity: 0.9; }
+        #welcome-screen {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .input-group { margin: 20px 0; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; }
+        .input-group input {
+            width: 80%;
+            max-width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        #timer-display {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #c0392b;
+            margin-bottom: 15px;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #27ae60;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s;
+        }
+        .question-card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+        }
+        .question-card.active { display: block; }
+        .option {
+            display: block;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .option:hover { background-color: #ecf0f1; }
+        .option.selected {
+            background-color: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+        .btn-nav {
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            font-size: 1em;
+        }
+        .btn-nav:disabled { background-color: #95a5a6; }
+        #results-screen {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .rationale {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #e8f6f3;
+            border-left: 5px solid #1abc9c;
+            font-size: 0.9em;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Nurse Technician Mastery</h1>
+    <p>Final Exam: Go or Not Go</p>
+</div>
+
+<div id="welcome-screen">
+    <h2>Welcome to Final Test Mastery</h2>
+    <p>Complete all 100 questions. Time Limit: 25 Minutes.</p>
+    <div class="input-group">
+        <label for="user-name">Enter Your Name:</label>
+        <input type="text" id="user-name" placeholder="John Doe, Tech">
+    </div>
+    <button class="btn-nav" onclick="startExam()">Start Exam</button>
+</div>
+
+<div id="timer-display"></div>
+
+<div class="progress-container" id="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+</div>
+
+<div id="quiz-container">
+</div>
+
+<div id="results-screen">
+    <h2>Exam Complete</h2>
+    <p id="candidate-name"></p>
+    <p id="score-text"></p>
+    <button class="btn-nav" onclick="location.reload()">Restart Exam</button>
+</div>
+
+<script>
+    // 100-Item Level 4 Test Bank
+    const questions = [
+        {
+            q: "A nurse technician is preparing to perform hand hygiene before a routine dressing change. According to the WHO, what is the minimum duration for rubbing hands with soap?",
+            options: ["Rub hands for 5 to 10 seconds.", "Rub hands for 20 to 30 seconds.", "Rub hands for 60 to 90 seconds.", "Rub hands for 3 to 4 minutes."],
+            correct: 1,
+            rationale: "Friction and time are necessary to eliminate transient flora. Twenty to thirty seconds is the standard for alcohol-based and soap-based procedures."
+        },
+        {
+            q: "While taking the vital signs of an adult patient, the nurse technician notes a pulse rate of 115 beats per minute. Which term should the technician use to document this?",
+            options: ["Document the rate as bradycardia.", "Document the rate as eupnea.", "Document the rate as tachycardia.", "Document the rate as hypertension."],
+            correct: 2,
+            rationale: "Tachycardia is defined as a resting heart rate over 100 beats per minute in an adult."
+        },
+        {
+            q: "To prevent the development of pressure injuries in a bedridden patient, the nurse technician should ensure the patient is repositioned at least every:",
+            options: ["Ensure repositioning every 1 hour.", "Ensure repositioning every 2 hours.", "Ensure repositioning every 4 hours.", "Ensure repositioning every 8 hours."],
+            correct: 1,
+            rationale: "Turning the patient every two hours minimizes uninterrupted tissue ischemia and protects fragile skin."
+        },
+        {
+            q: "When moving a patient from the bed to a stretcher, which body mechanics principle should the nurse technician apply to prevent self-injury?",
+            options: ["Bend at the waist using back muscles.", "Keep the feet close together for pivot.", "Keep the patient weight far from body.", "Bend at the knees using the leg muscles."],
+            correct: 3,
+            rationale: "Using the large muscles of the legs and keeping the center of gravity low prevents back strain."
+        },
+        {
+            q: "A nurse technician is about to enter the room of a patient on Contact Precautions. Which piece of Personal Protective Equipment (PPE) is required at a minimum?",
+            options: ["Use N95 respirator and clear goggles.", "Use a standard gown and clean gloves.", "Use a surgical mask and shoe covers.", "No PPE is required if not in contact."],
+            correct: 1,
+            rationale: "Contact precautions require a protective gown and gloves to block the transmission of multidrug-resistant organisms."
+        },
+        {
+            q: "A patient is diagnosed with Pneumonia. The technician understands that this condition primarily affects which part of the respiratory system where gas exchange occurs?",
+            options: ["The Trachea (primary windpipe).", "The Alveoli (microscopic air sacs).", "The Larynx (primary voice box).", "The Esophagus (food passage)."],
+            correct: 1,
+            rationale: "Pneumonia causes inflammation in the alveoli, making gas exchange difficult."
+        },
+        {
+            q: "The technician is caring for a patient with Dysphagia. What is the most important safety intervention during mealtime?",
+            options: ["Encourage the patient to eat rapidly.", "Keep the patient in a flat supine position.", "Monitor for coughing while upright.", "Provide a straw for all thin liquids."],
+            correct: 2,
+            rationale: "Sitting the patient upright during eating prevents aspiration of food particles."
+        },
+        {
+            q: "When a patient has Hypertension, which organ system is under increased pressure and at higher risk for long-term damage?",
+            options: ["Integumentary system (the skin).", "Cardiovascular system (blood vessels).", "Skeletal system (body's bones).", "Sensory system (the ears)."],
+            correct: 1,
+            rationale: "High systemic pressure puts excessive wear and tear on the cardiovascular vessels."
+        },
+        {
+            q: "A patient with Diabetes Mellitus has a very low blood glucose level (Hypoglycemia). Which of the following signs should the technician watch for?",
+            options: ["Dry and hot skin with extreme thirst.", "Frequent urination and fruity breath.", "Shakiness, sweating, and confusion.", "High energy levels and loud speech."],
+            correct: 2,
+            rationale: "Hypoglycemia manifests quickly through autonomic symptoms like sweating, shaking, and altered mental status."
+        },
+        {
+            q: "What physical change should the technician look for to confirm a diagnosis of Jaundice in a patient with Liver Cirrhosis?",
+            options: ["Deep purple bruising on the legs.", "Yellowing of the skin and the eyes.", "Bright red rash across the chest.", "Extremely pale or blue fingernails."],
+            correct: 1,
+            rationale: "Jaundice is caused by bilirubin buildup, presenting as a distinct yellowing of the skin and sclera."
+        },
+        {
+            q: "A nurse technician is preparing to transfer a patient from the bed to a chair. The patient is unsteady. Which safety device should the technician use?",
+            options: ["A mechanical lift (Hoyer lift).", "A transfer (gait) belt.", "A sliding board.", "A set of bed sheets used as a sling."],
+            correct: 1,
+            rationale: "A gait belt provides a secure handhold to maintain control and prevent falls during pivot transfers."
+        },
+        {
+            q: "When providing a bed bath to a patient, in what order should the nurse technician wash the body parts to maintain the best infection control?",
+            options: ["Feet, legs, then face.", "Back, buttocks, then chest.", "Face, arms, trunk, legs, then perineal area.", "Perineal area, then face and neck."],
+            correct: 2,
+            rationale: "Washing from cleanest to dirtiest areas prevents the spread of bacteria across body systems."
+        },
+        {
+            q: "The nurse technician is assisting a patient with visual impairment to eat their meal. Which method is most effective for describing the location of food?",
+            options: ["Using the numbers on a clock face.", "Pointing to the food and saying 'It is here.'", "Moving the patient's hand to touch food.", "Mixing all the food together in the dish."],
+            correct: 0,
+            rationale: "Using the clock face method provides a reliable, standardized reference frame for visually impaired patients."
+        },
+        {
+            q: "While performing passive Range of Motion (ROM) exercises for a patient’s elbow, the technician should stop the movement immediately if:",
+            options: ["The patient's skin becomes slightly pink.", "The patient complains of pain or resistance.", "The patient asks for a glass of water.", "The patient's arm starts sweating."],
+            correct: 1,
+            rationale: "Pain or resistance during ROM indicates the joint is being overextended."
+        },
+        {
+            q: "A nurse technician is preparing to weigh an adult patient. To obtain an accurate and consistent weight, which factor is most important?",
+            options: ["Ensure the patient is wearing shoes.", "Weigh the patient at different times daily.", "Use the same conditions and scale zero.", "Allow the patient to drink fluids first."],
+            correct: 2,
+            rationale: "Consistent measurement conditions eliminate external variables, ensuring accurate weight tracking."
+        },
+        {
+            q: "A nurse technician is at lunch in the hospital cafeteria and begins discussing a patient’s colorful behavior with a colleague. This action is a violation of:",
+            options: ["The patient’s right to a private room.", "HIPAA and patient confidentiality.", "The hospital’s dress code policy.", "The technician’s right to free speech."],
+            correct: 1,
+            rationale: "Patient information must remain private and never be discussed in public areas."
+        },
+        {
+            q: "A patient refuses to take their scheduled bath, stating they are too tired. What is the most appropriate response by the nurse technician?",
+            options: ["Force the patient to bathe anyway.", "Respect the patient’s right to refuse.", "Tell the patient they cannot have dinner.", "Call the patient’s family to scold them."],
+            correct: 1,
+            rationale: "Competent patients have the legal right to refuse treatments and care."
+        },
+        {
+            q: "Which of the following actions by a nurse technician would be considered Invasion of Privacy?",
+            options: ["Closing the curtain before a bedpan.", "Looking through a patient’s personal purse.", "Knocking on the door before entering.", "Covering a patient with a bath blanket."],
+            correct: 1,
+            rationale: "Searching through a patient's personal items without consent is an invasion of privacy."
+        },
+        {
+            q: "A nurse technician is asked by a patient's friend over the phone for an update on the patient’s condition. The technician should:",
+            options: ["Give a detailed report of the condition.", "Tell the friend the patient is doing 'okay'.", "Refer the caller to the nurse or protocol.", "Hang up the phone immediately without a word."],
+            correct: 2,
+            rationale: "Patient data should only be shared according to facility and HIPAA protocols."
+        },
+        {
+            q: "A grateful family member offers a nurse technician a 100 SAR tip for taking good care of their father. What should the technician do?",
+            options: ["Accept the money but do not tell anyone.", "Politely decline the money due to ethics.", "Ask for more money because of the shift.", "Put it into the general donation box."],
+            correct: 1,
+            rationale: "Accepting tips or gifts can compromise professional relationships."
+        },
+        {
+            q: "What is the correct sequence for donning (putting on) PPE as recommended by standard healthcare guidelines?",
+            options: ["Gloves, Gown, Mask, Goggles.", "Gown, Mask, Goggles, Gloves.", "Mask, Gloves, Gown, Goggles.", "Goggles, Gloves, Mask, Gown."],
+            correct: 1,
+            rationale: "Donning proceeds from the least contaminated to the most contaminated, starting with the gown."
+        },
+        {
+            q: "A nurse technician accidentally sticks themselves with a needle used for a patient’s blood draw. What is the first action the technician should take?",
+            options: ["Complete an incident report immediately.", "Wash the site thoroughly with soap and water.", "Ask the patient if they have a disease.", "Put a bandage on it and finish the shift."],
+            correct: 1,
+            rationale: "Immediate washing with soap and water minimizes mucosal and tissue exposure to pathogens."
+        },
+        {
+            q: "The technician is caring for a patient with a known Airborne infection, such as Tuberculosis (TB). What specific requirement must be met for the room?",
+            options: ["The door must remain open at all times.", "The room must have negative pressure and closed door.", "The room must be carpeted to reduce dust.", "No special room is required for airborne agents."],
+            correct: 1,
+            rationale: "Negative-pressure isolation prevents airborne pathogens from escaping into the hallway."
+        },
+        {
+            q: "A patient with suspected carbon monoxide poisoning arrives at the clinic. What type of oxygen mask should be prepared?",
+            options: ["A simple mask delivering 20% oxygen.", "A non-rebreather mask at 100% concentration.", "A nasal cannula delivering low-flow oxygen.", "A venturi mask providing exact 24% oxygen."],
+            correct: 1,
+            rationale: "High-concentration oxygen minimizes the half-life of carboxyhemoglobin."
+        },
+        {
+            q: "When cleaning a blood spill on the floor, the nurse technician must use an approved germicide and wear appropriate PPE to protect from:",
+            options: ["Inhalation of airborne dust particles.", "Blood-borne pathogens such as HBV or HIV.", "Rapid cooling of the ambient room air.", "Radiation exposure from portable equipment."],
+            correct: 1,
+            rationale: "Germicidal procedures protect the user from blood-borne contamination."
+        },
+        {
+            q: "A nurse technician is documenting the fluid intake for a patient. Which of the following entries is the most accurate and professional?",
+            options: ["'The patient drank a good amount.'", "'The patient seems very thirsty today.'", "'Patient consumed 240 mL of water.'", "'Patient drank half of a small blue cup.'"],
+            correct: 2,
+            rationale: "Medical documentation must be objective, measurable, and recorded in standard units."
+        },
+        {
+            q: "While assisting an elderly patient with a bath, the nurse technician notices unexplained bruises in various stages of healing. What is the responsibility?",
+            options: ["Ask the family members about it.", "Keep it a secret to protect patient privacy.", "Report the observations to the nurse immediately.", "Apply a cold compress and ignore the cause."],
+            correct: 2,
+            rationale: "Healthcare personnel must report suspected abuse or injuries to their supervisor."
+        },
+        {
+            q: "A nurse technician is caring for a patient from a different culture who refuses hospital food due to religious beliefs. What is the best way to show sensitivity?",
+            options: ["Tell the patient they must eat the food.", "Inform the nurse to arrange suitable food.", "Scold the patient for being difficult.", "Eat the patient's food so it is not wasted."],
+            correct: 1,
+            rationale: "Accommodating dietary preferences shows respect for the patient's culture and beliefs."
+        },
+        {
+            q: "Which of the following is considered Objective Data that a nurse technician should report?",
+            options: ["The patient says they feel dizzy.", "The patient’s daughter looks worried.", "The patient has a BP of 145/90 mmHg.", "The patient claims the room is cold."],
+            correct: 2,
+            rationale: "Objective data can be measured and verified."
+        },
+        {
+            q: "A nurse technician realizes they recorded the wrong vital signs in a patient's chart. What is the correct way to correct this error?",
+            options: ["Use correction fluid to cover the mistake.", "Scribble over the entry completely.", "Draw a single line through, write 'error', and initial.", "Throw the page away and start over."],
+            correct: 2,
+            rationale: "Errors are corrected with a single line so the original entry remains visible."
+        },
+        {
+            q: "A patient with a terminal illness has a Do Not Resuscitate (DNR) order. If the technician finds this patient without a pulse or breathing, the technician should:",
+            options: ["Start high-quality CPR immediately.", "Call a Code Blue and get the crash cart.", "Stay with the patient and immediately notify the nurse.", "Pretend they didn't see the patient."],
+            correct: 2,
+            rationale: "A DNR order indicates that resuscitation should not be performed."
+        },
+        {
+            q: "Which of the following is an example of Non-Verbal Communication that suggests pain, even if the patient says they are 'fine'?",
+            options: ["The patient is sleeping quietly.", "The patient is grimacing and guarding the abdomen.", "The patient is watching television and laughing.", "The patient asks for a glass of water."],
+            correct: 1,
+            rationale: "Non-verbal cues are often more accurate indicators of distress than verbal ones."
+        },
+        {
+            q: "A nurse technician is being shouted at by a frustrated family member. What is the most professional way to handle this conflict?",
+            options: ["Shout back so the family knows you are in charge.", "Remain calm and move to a private area.", "Walk away immediately without saying a word.", "Threaten to have the patient discharged."],
+            correct: 1,
+            rationale: "De-escalation preserves order and prevents patient stress."
+        },
+        {
+            q: "A nurse technician sees a co-worker taking a photo of a patient’s wound to post on their personal social media account. What should the technician do?",
+            options: ["Ask the co-worker to tag them in the post.", "Ignore it because it is on a personal phone.", "Report the incident to the supervisor immediately.", "Wait and see if the photo gets many likes."],
+            correct: 2,
+            rationale: "Taking or sharing photos of patients without consent is a severe breach of confidentiality."
+        },
+        {
+            q: "A nurse technician is caring for a patient who is crying because they are worried about upcoming surgery. Which response is therapeutic?",
+            options: ["'Don't cry; everything will be perfectly fine.'", "'My cousin had this surgery, too.'", "'It’s normal to feel nervous; would you like to talk about it?'", "'You shouldn't be sad; you have a good doctor.'"],
+            correct: 2,
+            rationale: "Active listening and open-ended questions encourage the patient to share concerns."
+        },
+        {
+            q: "While helping a patient with a gown change, the technician notices the patient has a large sum of cash in the bedside drawer. What is the safest action?",
+            options: ["Tell the patient to hide it under their pillow.", "Suggest the patient put it in the hospital safe.", "Offer to keep the money in your own locker.", "Ignore the money and hope no one sees it."],
+            correct: 1,
+            rationale: "Directing the patient to security channels protects their valuables."
+        },
+        {
+            q: "Which of the following is a clear violation of Professional Boundaries for a nurse technician?",
+            options: ["Comforting a grieving family member with a brief touch.", "Sharing personal financial problems with a patient.", "Refusing to tell a patient your home address.", "Declining an invitation to go on a date."],
+            correct: 1,
+            rationale: "Discussing personal problems shifts the focus away from the patient's care."
+        },
+        {
+            q: "A nurse technician is assigned to a patient who is famous. Co-workers who are not assigned ask to see the chart out of curiosity. The technician should:",
+            options: ["Let them look as long as they don't tell anyone.", "Tell them that only staff on the case can see the chart.", "Charge the co-workers a small fee.", "Print a copy of the chart and leave it in the breakroom."],
+            correct: 1,
+            rationale: "Accessing medical records out of curiosity is a confidentiality violation."
+        },
+        {
+            q: "What is the primary purpose of Informed Consent before a surgical procedure?",
+            options: ["To ensure the hospital gets paid by insurance.", "To make sure the patient understands risks and benefits.", "To prevent the patient from complaining.", "To prove the patient is physically strong."],
+            correct: 1,
+            rationale: "Informed consent ensures patient autonomy and knowledge of procedures."
+        },
+        {
+            q: "A nurse technician is assisting a patient who is demanding to leave the hospital against medical advice (AMA). What is the best course of action?",
+            options: ["Lock the door so the patient cannot leave.", "Tell the patient they will be arrested.", "Immediately notify the nurse to get forms signed.", "Help the patient pack their bags and show them the exit."],
+            correct: 2,
+            rationale: "The nurse must be notified to document the patient's understanding of the risks involved in leaving."
+        },
+        {
+            q: "Which of the following is the most professional way to handle a disagreement with a co-worker about a care task?",
+            options: ["Argue with the co-worker in front of the patient.", "Discuss the matter privately or consult the supervisor.", "Complain about the co-worker to the family.", "Refuse to work with that co-worker."],
+            correct: 1,
+            rationale: "Disagreements should be resolved away from the patient to maintain trust."
+        },
+        {
+            q: "A nurse technician overhears a nurse making a joke about a patient's weight. This behavior is an example of a lack of:",
+            options: ["Clinical competence.", "Professionalism and respect for human dignity.", "Time management skills.", "Physical strength."],
+            correct: 1,
+            rationale: "Disparaging remarks about a patient violate the professional code of conduct."
+        },
+        {
+            q: "What should a nurse technician do if they see a 'Notice of Privacy Practices' poster falling off the wall in a public waiting area?",
+            options: ["Throw it away since everyone has read it.", "Fix it or report it to be fixed.", "Wait for the cleaning crew to handle it.", "Draw a funny picture on the back of it."],
+            correct: 1,
+            rationale: "Maintaining posted privacy notices ensures that patients' legal rights are visible."
+        },
+        {
+            q: "A patient who is actively dying has a large family presence in the room, praying loudly. How should the nurse technician respond?",
+            options: ["Tell the family to be quiet to avoid noise.", "Ask the family to leave so the floor can be mopped.", "Provide the family with privacy and support their practices.", "Join the prayer without being invited."],
+            correct: 2,
+            rationale: "Respecting cultural rituals is a critical component of end-of-life care."
+        },
+        {
+            q: "A nurse technician is assisting a mother with postpartum care. The mother’s bedsheet is soaked with bright red blood shortly after delivery. What is the priority?",
+            options: ["Change the sheets quickly.", "Massage the mother's abdomen vigorously.", "Notify the nurse immediately of the heavy bleeding.", "Tell the mother this is normal."],
+            correct: 2,
+            rationale: "Postpartum hemorrhage is an emergency and requires immediate assessment by a nurse."
+        },
+        {
+            q: "When weighing a newborn infant in the nursery, which safety measure is most important for the nurse technician to follow?",
+            options: ["Leave the infant on the scale to go document.", "Keep one hand hovering just above the infant at all times.", "Weigh the infant with heavy winter clothes on.", "Place the scale on the floor to make it safer."],
+            correct: 1,
+            rationale: "Hovering a hand above the infant prevents them from rolling off the scale."
+        },
+        {
+            q: "A nurse technician is assigned to the Pediatric unit. A 4-year-old child is crying for their parents. Which action by the technician is most helpful?",
+            options: ["Tell the child that 'big kids don't cry'.", "Offer a favorite toy or simple distraction.", "Lock the door so the child cannot run away.", "Ignore the crying to build independence."],
+            correct: 1,
+            rationale: "Distraction reduces separation anxiety and builds trust."
+        },
+        {
+            q: "In a Mental Health unit, a patient begins to pace rapidly and speak in a loud, agitated voice. What should the technician do first?",
+            options: ["Tell the patient to sit down and be quiet.", "Maintain a safe distance and alert the nurse to the change.", "Try to physically restrain the patient before they hit someone.", "Turn up the volume on the television."],
+            correct: 1,
+            rationale: "Reporting changes in a patient's behavior prevents escalation."
+        },
+        {
+            q: "A nurse technician is helping a patient who has just had a Cesarean section (C-section) get out of bed for the first time. The technician should instruct the patient to:",
+            options: ["Use abdominal muscles to sit up straight.", "Hold a pillow against the incision (splinting).", "Jump out of bed quickly to get the blood flowing.", "Keep their eyes closed to avoid getting dizzy."],
+            correct: 1,
+            rationale: "Splinting provides support to the wound and reduces incisional pain."
+        },
+        {
+            q: "After a mother finishes breastfeeding, the nurse technician is asked to help burp the infant. What is the safest way to position the infant?",
+            options: ["Lying flat on their stomach on the bed.", "Upright over the shoulder or forward, supporting the jaw.", "Hanging upside down by the feet.", "Lying on their back with the head lower than the feet."],
+            correct: 1,
+            rationale: "An upright position allows air to rise while supporting the infant's airway."
+        },
+        {
+            q: "When measuring the respiratory rate of a crying toddler, the technician knows the reading will likely be:",
+            options: ["More accurate than when the child is sleeping.", "Falsely high due to exertion from crying.", "Falsely low because crying causes long pauses.", "Exactly the same as an adult's rate."],
+            correct: 1,
+            rationale: "Crying alters breathing and increases the respiratory rate."
+        },
+        {
+            q: "A nurse technician is assigned to a patient with Anorexia Nervosa. The patient asks to use the bathroom immediately after a meal. What is the standard protocol?",
+            options: ["Allow them to go alone to respect privacy.", "Tell them they cannot use the bathroom all day.", "Accompany the patient to prevent purging.", "Give them a large glass of water."],
+            correct: 2,
+            rationale: "Protocols dictate observation after meals to prevent the patient from purging."
+        },
+        {
+            q: "While working in the Labor and Delivery unit, the technician sees a father who looks extremely pale and feels faint. What is the first action?",
+            options: ["Tell him to 'man up'.", "Assist the father to sit or lie down.", "Ignore him because the mother is the patient.", "Give him a cup of hot coffee."],
+            correct: 1,
+            rationale: "Preventing the father from falling avoids secondary injuries."
+        },
+        {
+            q: "Which of the following is an important safety rule when providing care to a pediatric patient in a crib?",
+            options: ["Keep the side rails down so parents can reach the child.", "Always keep side rails upright and locked.", "Fill the crib with large pillows to keep the child cozy.", "Tie the child’s hands to the rail."],
+            correct: 1,
+            rationale: "Crib rails prevent falls and injury in infants."
+        },
+        {
+            q: "A nurse technician is caring for a patient with severe burns on a large percentage of their body surface area. Which action is most important for thermoregulation?",
+            options: ["Keep the room temperature very cold.", "Use a specialized cap or head covering.", "Bathe the patient with ice-cold water.", "Leave the patient completely uncovered."],
+            correct: 1,
+            rationale: "Caps prevent massive heat loss through the head in burn patients."
+        },
+        {
+            q: "A nurse technician is preparing a room for a patient admitted with acute depression and suicidal ideation. Which environmental check is a priority?",
+            options: ["Ensure there is a large glass vase of flowers.", "Remove any sharp objects, cords, or glass items.", "Make sure the window can be opened fully.", "Dim all the lights."],
+            correct: 1,
+            rationale: "Removing glass and sharp objects prevents the patient from using them for self-harm."
+        },
+        {
+            q: "A patient with an intravenous (IV) line needs to change into a hospital gown. How should the technician proceed without interrupting the infusion?",
+            options: ["Disconnect the IV tubing from the machine.", "Thread the IV bag and tubing through the sleeve.", "Stop the IV completely until the patient finishes.", "Remove the IV needle to take the gown off."],
+            correct: 1,
+            rationale: "Threading the bag through the gown sleeve maintains the sterility of the IV system."
+        },
+        {
+            q: "A patient in the psychiatric unit states, 'I see spiders crawling all over the walls.' How should the nurse technician respond?",
+            options: ["'Where are the spiders? Let me help you kill them.'", "'Don't be silly; there are no spiders in this room.'", "'I do not see any spiders, but I understand that you are feeling frightened right now.'", "'You need to take your medication immediately.'"],
+            correct: 2,
+            rationale: "Acknowledge the patient's feelings without validating hallucinations or presenting a dismissive tone."
+        },
+        {
+            q: "When performing perineal care for a female patient, which direction should the technician wipe to prevent infection?",
+            options: ["From the back toward the front.", "From the front toward the back.", "In a circular motion all around.", "It does not matter which direction you wipe."],
+            correct: 1,
+            rationale: "Wiping from front to back prevents the transmission of rectal bacteria into the urethra."
+        },
+        {
+            q: "In a pediatric ward, the technician notices signs of respiratory distress in an infant, including nasal flaring and grunting. What is the priority action?",
+            options: ["Give the infant a bottle of milk to calm them.", "Wrap the infant tightly in a blanket.", "Report the findings to the nurse immediately.", "Check the infant's diaper for wetness."],
+            correct: 2,
+            rationale: "Nasal flaring is a key sign of respiratory distress that must be reported at once."
+        },
+        {
+            q: "A pediatric patient is placed in a mist tent for respiratory treatment. Which toy is unsafe to bring into the tent?",
+            options: ["A soft plush teddy bear.", "A battery-operated electronic car that could spark.", "A wooden building block.", "A plastic rattle."],
+            correct: 1,
+            rationale: "Electronic toys can spark and create a fire hazard in high-oxygen environments."
+        },
+        {
+            q: "A patient in the psychiatric ward shares a secret plan to escape the hospital and asks the nurse technician not to tell anyone. What should the technician do?",
+            options: ["Keep the secret to build trust.", "Report the secret to the nurse in charge immediately.", "Tell the patient's family about the escape plan.", "Write the secret on a piece of paper and leave it on the desk."],
+            correct: 1,
+            rationale: "The safety of the patient and others always takes precedence, and secrets must not be kept."
+        },
+        {
+            q: "A nurse technician is assigned to a patient experiencing a grand mal seizure. Which action should the technician perform?",
+            options: ["Restrain the patient's arms and legs.", "Turn the patient's head to the side and clear the area.", "Force a spoon or tongue depressor into the patient's mouth.", "Pour cold water on the patient's face."],
+            correct: 1,
+            rationale: "The side-lying position maintains an open airway, while clearing the area prevents injury."
+        },
+        {
+            q: "A nurse technician is assigned to an older adult patient who is confused and disoriented to place and time. Which of the following approaches is best for communication?",
+            options: ["Provide a complex, detailed schedule of future appointments.", "Use clear, simple sentences and reorient gently.", "Speak very loudly in the patient's ear.", "Avoid talking to the patient since they do not understand."],
+            correct: 1,
+            rationale: "Clear, simple, and direct reorientation reduces anxiety and confusion."
+        },
+        {
+            q: "A patient with diabetes has an order for a fasting blood glucose test. The technician notes that the patient drank a cup of sweet tea before the test. What is the priority action?",
+            options: ["Perform the test and document it as normal.", "Cancel the test on their own authority.", "Notify the nurse that the patient did not fast.", "Give the patient insulin before testing."],
+            correct: 2,
+            rationale: "Fasting tests require no caloric intake, and the nurse must be notified so the schedule can be adjusted."
+        },
+        {
+            q: "A nurse technician is caring for a patient who has a nasogastric (NG) tube. How often should the technician provide oral hygiene care?",
+            options: ["Once a day, usually in the evening.", "Every 2 to 4 hours.", "Only when the patient complains of a dry mouth.", "Once a week."],
+            correct: 1,
+            rationale: "NG tubes cause mouth-breathing and rapid mucosal drying, necessitating frequent oral care."
+        },
+        {
+            q: "When positioning a patient with a left-sided stroke (hemiplegia) in bed, the nurse technician should place pillows to support the weak arm in what position?",
+            options: ["Lower than the rest of the body to prevent swelling.", "Slightly elevated and supported to prevent contractures and edema.", "Flat against the mattress with no support.", "Extended straight out above the head."],
+            correct: 1,
+            rationale: "Elevation and proper alignment prevent shoulder subluxation and contracture formation."
+        },
+        {
+            q: "A nurse technician is observing a patient who is receiving an enema. The patient complains of severe cramping and abdominal pain. What is the priority action?",
+            options: ["Administer the rest of the fluid as quickly as possible.", "Lower the enema bag or clamp the tubing temporarily.", "Remove the tube completely without telling the nurse.", "Tell the patient to stop complaining and hold it in."],
+            correct: 1,
+            rationale: "Fluid flowing in too fast causes cramping; clamping the tubing or slowing the flow provides relief."
+        },
+        {
+            q: "Which safety device must be tested and confirmed functional before admitting an infant to an incubator?",
+            options: ["The safety lock on the baby's clothing.", "The temperature alarm and heating element.", "The suction pressure for oral secretions.", "The overhead monitor for heart rhythms."],
+            correct: 1,
+            rationale: "Temperature controls and alarms prevent life-threatening hypothermia or hyperthermia."
+        },
+        {
+            q: "A nurse technician is assigned to four patients. Which of the following findings should be reported to the nurse immediately?",
+            options: ["A patient with a cast complaining of an itch.", "A patient with a pulse rate that has increased from 72 to 110 beats per minute.", "A patient who refused their breakfast tray.", "A patient who requested a fresh glass of water."],
+            correct: 1,
+            rationale: "A sudden, unexplained increase in heart rate can indicate a medical complication."
+        },
+        {
+            q: "Which task is outside the scope of practice for a nurse technician and should be politely declined?",
+            options: ["Taking a rectal temperature on an adult patient.", "Applying a simple, non-sterile dry dressing to a minor skin tear.", "Adjusting the flow rate of an intravenous (IV) medication pump.", "Assisting a patient with a history of stroke to use a walker."],
+            correct: 2,
+            rationale: "Adjusting IV pumps is an advanced, high-risk task reserved for licensed nurses."
+        },
+        {
+            q: "When answering a question about priority, the technician should remember that physiological needs come first. Which of these is the highest priority?",
+            options: ["Helping a patient find their lost eyeglasses.", "Ensuring a patient with difficulty swallowing is sitting upright during a meal.", "Emptying a full urinary drainage bag.", "Changing a soiled bedsheet for a patient who is sleeping."],
+            correct: 1,
+            rationale: "Ensuring an open airway and preventing aspiration is a life-saving physiological intervention."
+        },
+        {
+            q: "A technician is asked to collect a mid-stream (clean-catch) urine specimen. What is the most important instruction to give the patient?",
+            options: ["'Collect the very first drop of urine into the cup.'", "'Fill the cup to the very top so the lab has enough.'", "'Start urinating into the toilet, then place the cup into the stream.'", "'It does not matter if the inside of the cup is touched.'"],
+            correct: 2,
+            rationale: "Mid-stream collections wash away residual flora from the urethral meatus, yielding a clean sample."
+        },
+        {
+            q: "In a 'test-trap' question, you might see the word 'Always' or 'Never.' Why are these often incorrect in clinical scenarios?",
+            options: ["Because they represent absolute statements that rarely account for individual patient needs.", "Because they are too short to be the right answer.", "Because they are only used for emergency procedures.", "Because the test-maker wants to make the question easier."],
+            correct: 0,
+            rationale: "Medical procedures depend on the patient's condition, so absolute rules are rarely accurate."
+        },
+        {
+            q: "A nurse technician is about to help a patient out of bed. The technician notices the patient’s identification (ID) band is missing. What is the most appropriate action?",
+            options: ["Ask the patient’s roommate to identify them.", "Check the name on the door and proceed with the task.", "Stop and ask the nurse to provide a new ID band after verifying the patient’s identity.", "Assume it is the correct patient because the technician recognized them from yesterday."],
+            correct: 2,
+            rationale: "You must always verify the patient's identity using two forms of identification before performing a procedure."
+        },
+        {
+            q: "Which of the following is a 'test-trap' distractor when asked about patient safety during a fall?",
+            options: ["Lowering the patient gently to the floor.", "Protecting the patient's head from hitting furniture.", "Trying to catch the patient and keep them standing at all costs.", "Calling for help while staying with the patient."],
+            correct: 2,
+            rationale: "Trying to catch a falling patient can injure both the patient and the healthcare worker."
+        },
+        {
+            q: "When a question asks for the first action in a clinical scenario, the technician should prioritize:",
+            options: ["Documenting the event in the chart.", "Assessing the patient for immediate danger or distress.", "Calling the doctor to report the situation.", "Cleaning the room to prepare for a procedure."],
+            correct: 1,
+            rationale: "Assessment is always the first step in the clinical problem-solving process."
+        },
+        {
+            q: "A nurse technician is assisting a patient with a weak right side to walk. Where should the technician stand?",
+            options: ["On the patient's left (strong) side.", "On the patient's right (weak) side.", "Directly in front of the patient, walking backward.", "Behind the patient, holding onto their waist."],
+            correct: 1,
+            rationale: "Standing on the weak side allows the technician to provide stability and support if the patient's leg gives way."
+        },
+        {
+            q: "A technician is asked to perform a Point-of-Care (POC) Blood Glucose test. The technician has performed this many times but realizes the control solution for the machine has expired. The technician should:",
+            options: ["Use the expired solution anyway; it probably still works.", "Skip the control test and just check the patient's sugar.", "Obtain a new, unexpired control solution before testing the patient.", "Use water instead of the control solution."],
+            correct: 2,
+            rationale: "Using expired solutions compromises the accuracy and validity of the equipment."
+        },
+        {
+            q: "After removing personal protective equipment (PPE) after caring for an isolated patient, which action should the nurse technician perform last?",
+            options: ["Take off the gown.", "Remove the goggles.", "Perform hand hygiene.", "Take off the mask."],
+            correct: 2,
+            rationale: "Hand hygiene removes any transient microorganisms acquired during the PPE removal sequence."
+        },
+        {
+            q: "Post-mortem care has been completed by the nurse technician. What is the main goal when preparing the patient's body and room?",
+            options: ["To prepare the body for immediate autopsy.", "To make the body look peaceful and dignified for the family.", "To hide the patient's condition from other visitors.", "To leave all of the medical equipment attached."],
+            correct: 1,
+            rationale: "Post-mortem care focuses on dignity and respect to help the family's grieving process."
+        },
+        {
+            q: "When monitoring the oxygen saturation of a patient using a pulse oximeter, what should the nurse technician check before applying the sensor?",
+            options: ["Whether the patient is right-handed or left-handed.", "If the patient is wearing dark or waterproof nail polish.", "If the patient's blood pressure is high.", "Whether the patient is breathing through the nose or mouth."],
+            correct: 1,
+            rationale: "Dark or waterproof nail polish interferes with the sensor's light absorption."
+        },
+        {
+            q: "A nurse technician in a psychiatric unit observes a patient trying to swallow a large plastic utensil during a meal. What is the priority action?",
+            options: ["Write an incident report for the supervisor.", "Approach the patient, ensure a clear airway, and notify the clinical team.", "Tell the other patients not to look.", "Wait until the patient finishes their meal."],
+            correct: 1,
+            rationale: "Ensuring an open airway and patient safety is the immediate priority during a self-harm emergency."
+        },
+        {
+            q: "What is the best approach when you are running out of time during an exam and have several unanswered questions?",
+            options: ["Change all of your previous answers just to be safe.", "Do not leave any question blank; ensure every item is filled.", "Skip the rest of the questions and submit the exam early.", "Guess 'A' for all remaining questions without reading them."],
+            correct: 1,
+            rationale: "Unanswered questions are scored as incorrect on standard credentialing exams."
+        },
+        {
+            q: "Which of the following is considered a subjective finding that needs to be reported by a nurse technician?",
+            options: ["The patient's temperature is 38.5°C.", "The patient complains of nausea and feeling unwell.", "The patient's urine output is 400 mL in 8 hours.", "The patient has a blood pressure reading of 110/70 mmHg."],
+            correct: 1,
+            rationale: "Subjective data are symptoms described by the patient that cannot be measured directly by healthcare staff."
+        },
+        {
+            q: "When transferring a patient from a wheelchair to the bed, the nurse technician should position the wheelchair at what angle to the bed?",
+            options: ["Parallel to the bed.", "At a 45-degree angle.", "Perpendicular to the bed.", "It does not matter what angle."],
+            correct: 1,
+            rationale: "A 45-degree angle ensures maximum stability during the pivot maneuver."
+        },
+        {
+            q: "A nurse technician needs to provide a bed bath for an unconscious patient. What is the most important infection control measure?",
+            options: ["Use a new basin and water for every part of the bath.", "Change gloves between the perianal area and other body parts.", "Do not wash the patient's face to avoid water inhalation.", "Keep the patient uncovered throughout the procedure."],
+            correct: 1,
+            rationale: "Changing gloves prevents cross-contamination of body systems, particularly when moving from the perineum to other body parts."
+        },
+        {
+            q: "A nurse technician is assisting a patient using an incentive spirometer. Which instruction should the technician reinforce?",
+            options: ["Breathe out as hard as you can into the device.", "Inhale slowly and deeply to raise the indicator ball.", "Hold your breath for no more than 2 seconds.", "Use the device only once a day."],
+            correct: 1,
+            rationale: "Slow, deep inhalation promotes maximum lung expansion and keeps airways open."
+        },
+        {
+            q: "A nurse technician is measuring a patient's pulse. Which method is most accurate for measuring an irregular pulse?",
+            options: ["Measure for 15 seconds and multiply by 4.", "Measure for 30 seconds and multiply by 2.", "Measure the apical pulse for a full 60 seconds.", "Estimate the pulse by watching the monitor."],
+            correct: 2,
+            rationale: "Measuring for a full 60 seconds is required to account for skipped beats and rhythm variations."
+        },
+        {
+            q: "A patient with a Foley catheter complains of lower abdominal fullness and the need to urinate. What is the priority action?",
+            options: ["Increase the IV flow rate.", "Check the tubing for kinks, blockages, or dependent loops.", "Change the catheter bag immediately.", "Tell the patient that the sensation is completely normal."],
+            correct: 1,
+            rationale: "Abdominal fullness with an indwelling catheter often indicates an obstruction that requires checking the system."
+        },
+        {
+            q: "Which of the following interventions helps prevent deep vein thrombosis (DVT) in a post-operative patient?",
+            options: ["Encouraging prolonged bed rest.", "Applying anti-embolic stockings (TED hose) and assisting with ambulation.", "Restricting fluid intake.", "Positioning the patient on the abdomen."],
+            correct: 1,
+            rationale: "Ambulation and compression stockings promote venous blood return and prevent stasis."
+        },
+        {
+            q: "A nurse technician is preparing a patient for a surgical procedure. Which duty is within the scope of practice?",
+            options: ["Explaining the surgical risks to the patient.", "Verifying the surgical site and patient's name on the identity band.", "Prescribing pain medication.", "Administering intravenous anesthesia."],
+            correct: 1,
+            rationale: "Verifying patient and site identification is a standard safety protocol that a technician can perform."
+        },
+        {
+            q: "A patient's family member insists on knowing the patient's diagnosis. The patient is awake and oriented. What should the nurse technician do?",
+            options: ["Share the information so the family member can help.", "Tell the family member to ask the patient directly if they wish to share their information.", "Refer the family member to the hospital administrator.", "Politely decline and change the subject."],
+            correct: 1,
+            rationale: "Patient autonomy dictates that the patient determines who is informed about their diagnosis."
+        },
+        {
+            q: "The nurse technician accidentally spills a chemical solution on the floor. Where should the technician look for information regarding cleanup and hazards?",
+            options: ["The patient's chart.", "The Safety Data Sheet (SDS) binder.", "The employee breakroom bulletin board.", "The nurse's personal phone."],
+            correct: 1,
+            rationale: "The SDS binder contains specific instructions on hazard management and emergency cleanup procedures."
+        }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let participantName = "";
+    let timeLeft = 1500; // 25 minutes in seconds
+    let timerInterval;
+
+    function startExam() {
+        const nameInput = document.getElementById('user-name').value.trim();
+        if (!nameInput) {
+            alert("Please enter your name to start the exam.");
+            return;
+        }
+        
+        participantName = nameInput;
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('progress-container').style.display = 'block';
+        
+        initQuiz();
+        document.querySelectorAll('.question-card')[0].classList.add('active');
+        startTimer();
+    }
+
+    function startTimer() {
+        const timerDisplay = document.getElementById('timer-display');
+        updateTimerDisplay();
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay();
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("Time is up!");
+                showResults();
+            }
+        }, 1000);
+    }
+
+    function updateTimerDisplay() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        document.getElementById('timer-display').innerText = `Time Left: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+
+    function initQuiz() {
+        const container = document.getElementById('quiz-container');
+        questions.forEach((q, index) => {
+            const card = document.createElement('div');
+            card.className = `question-card`;
+            card.id = `q-card-${index}`;
+            card.innerHTML = `
+                <h3>Question ${index + 1} of ${questions.length}</h3>
+                <p>${q.q}</p>
+                ${q.options.map((opt, i) => `<div class="option" onclick="selectOption(${index}, ${i}, this)">${opt}</div>`).join('')}
+                <div class="rationale" id="rationale-${index}"><strong>Rationale:</strong> ${q.rationale}</div>
+                <button class="btn-nav" id="next-btn-${index}" onclick="nextQuestion()" style="display:none">Next Question</button>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function selectOption(qIndex, oIndex, element) {
+        const card = document.getElementById(`q-card-${qIndex}`);
+        const options = card.querySelectorAll('.option');
+        
+        if (card.querySelector('.selected')) return;
+
+        element.classList.add('selected');
+        const rationale = card.querySelector(`#rationale-${qIndex}`);
+        
+        if (oIndex === questions[qIndex].correct) {
+            score++;
+            element.style.backgroundColor = "#27ae60";
+            element.style.color = "white";
+        } else {
+            element.style.backgroundColor = "#e74c3c";
+            element.style.color = "white";
+            options[questions[qIndex].correct].style.backgroundColor = "#27ae60";
+            options[questions[qIndex].correct].style.color = "white";
+        }
+
+        rationale.style.display = 'block';
+        document.getElementById(`next-btn-${qIndex}`).style.display = 'inline-block';
+    }
+
+    function nextQuestion() {
+        const cards = document.querySelectorAll('.question-card');
+        cards[currentQuestionIndex].classList.remove('active');
+        currentQuestionIndex++;
+
+        updateProgress();
+
+        if (currentQuestionIndex < questions.length) {
+            cards[currentQuestionIndex].classList.add('active');
+        } else {
+            showResults();
+        }
+    }
+
+    function Progress() {
+        const percent = (currentQuestionIndex / questions.length) * 100;
+        document.getElementById('progress-bar').style.width = percent + '%';
+    }
+
+    function showResults() {
+        clearInterval(timerInterval);
+        document.getElementById('progress-container').style.display = 'none';
+        document.getElementById('timer-display').style.display = 'none';
+        
+        // Hide all cards if any were active
+        const cards = document.querySelectorAll('.question-card');
+        cards.forEach(card => card.classList.remove('active'));
+
+        const results = document.getElementById('results-screen');
+        results.style.display = 'block';
+        
+        document.getElementById('candidate-name').innerHTML = `Candidate: <strong>${participantName}</strong>`;
+        document.getElementById('score-text').innerText = `You scored ${score} out of ${questions.length}`;
+    }
+</script>
+</body>
+</html>
